@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// returns most recent commit hash where SHA-256 of file rootPath/relPath matches sha
 func commitForSha(rootPath, relPath, sha string) string {
 	// fmt.Println("commitForSha", rootPath, relPath, sha)
 	shas := shasOfFile(rootPath, relPath)

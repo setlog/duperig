@@ -29,7 +29,7 @@ func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
-				commitA, commitB := richCommit(commitForSha(dirA, relPath, comp.hashA)), richCommit(commitForSha(dirB, relPath, comp.hashB))
+				commitA, commitB := richCommit(commitForSha(dirA, relPath, comp.hashA), color.FgHiBlack), richCommit(commitForSha(dirA, relPath, comp.hashB), color.FgMagenta)
 				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize("DIFF", color.FgYellow, true), relPath,
 					colorize(comp.hashA[:10], color.FgHiBlack, true), commitA, colorize(comp.hashB[:10], color.FgHiBlack, true), commitB)
 			}
@@ -39,11 +39,11 @@ func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
 	}
 }
 
-func richCommit(commit string) string {
+func richCommit(commit string, col color.Attribute) string {
 	if commit == "" {
 		return colorize("(NO MATCHING COMMIT)", color.FgRed, true)
 	}
-	return fmt.Sprintf("(Commit: %s)", colorize(commit[:10], color.FgHiBlack, true))
+	return fmt.Sprintf("(Commit: %s)", colorize(commit[:10], col, true))
 }
 
 func compareHierarchies(a, b map[string]string) map[string]comparison {
