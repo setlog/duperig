@@ -17,7 +17,7 @@ func main() {
 	dirA, dirB := parseFlags()
 	dirAHierarchy, dirBHierarchy := scanDir(dirA, "."), scanDir(dirB, ".")
 	comparisons := compareHierarchies(dirAHierarchy, dirBHierarchy)
-	logComparisons(comparisons)
+	logComparisons(dirA, dirB, comparisons)
 }
 
 type comparison struct {
@@ -25,16 +25,25 @@ type comparison struct {
 	hashB string
 }
 
-func logComparisons(comparisons map[string]comparison) {
+func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
-				fmt.Printf("%s: %s: %s vs %s\n", colorize("DIFF", color.FgRed, true), relPath, comp.hashA[:8], comp.hashB[:8])
+				commitA, commitB := richCommit(commitForSha(dirA, relPath, comp.hashA)), richCommit(commitForSha(dirB, relPath, comp.hashB))
+				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize("DIFF", color.FgYellow, true), relPath,
+					colorize(comp.hashA[:10], color.FgHiBlack, true), commitA, colorize(comp.hashB[:10], color.FgHiBlack, true), commitB)
 			}
 		} else {
-			fmt.Printf("%s: %s @ %s\n", colorize("DUPE", color.FgYellow, true), relPath, comp.hashA[:8])
+			fmt.Printf("%s: %s @ %s\n", colorize("DUPE", color.FgHiWhite, true), relPath, colorize(comp.hashA[:10], color.FgHiBlack, true))
 		}
 	}
+}
+
+func richCommit(commit string) string {
+	if commit == "" {
+		return colorize("(NO MATCHING COMMIT)", color.FgRed, true)
+	}
+	return fmt.Sprintf("(Commit: %s)", colorize(commit[:10], color.FgHiBlack, true))
 }
 
 func compareHierarchies(a, b map[string]string) map[string]comparison {
@@ -63,7 +72,7 @@ func scanDir(rootPath string, relPath string) map[string]string {
 	absPath := filepath.Join(rootPath, relPath)
 	infos, err := ioutil.ReadDir(absPath)
 	if err != nil {
-		fatalf("Could not read dir \"%s\": %v", scanDir, err)
+		fatalf("Could not read dir \"%s\": %v", absPath, err)
 	}
 	for _, info := range infos {
 		if info.IsDir() {
