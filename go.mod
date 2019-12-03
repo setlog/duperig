@@ -1,4 +1,4 @@
-module github.com/MMulthaupt/duperig
+module github.com/setlog/duperig
 
 go 1.13
 
