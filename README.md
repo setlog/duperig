@@ -14,7 +14,11 @@ go get -u github.com/MMulthaupt/duperig
 
 ### Usage
 
-`duperig path/to/folder/from/which/files/were/copied path/to/folder/to/which/files/were/copied`
+`git checkout` the correct revisions of the projects in which you want to compare folder hierarchies, then use the command like so:
+
+```
+duperig path/to/folder/from/which/files/were/copied path/to/folder/to/which/files/were/copied
+```
 
 ### Example
 
@@ -25,6 +29,8 @@ DIFF: data/Result.java: 711528c9c2 (Commit: a70d2cc30f) vs 2503ca3aeb (Commit: 4
 DIFF: data/Data.java: 123456789ab (Commit: 98765434567) vs 2637485985 (NO MATCHING COMMIT)
 DUPE: mail/MailClient.java @ 3ec54907a4
 DUPE: save/Database.java @ 5c346980d6
+There are 5 coinciding paths. Out of these, 2 have matching files and 3 have differing files.
+Out of the 3 different files, 1 files have modifications unknown to the repository at /home/u/projects/thingamajig_base.
 ```
 
 Folder structure at `projects/thingamajig_special/src/main/java/com/pany` has 5 files with paths coninciding with 5 other files under `projects/thingamajig_base/src/main/java/com/pany`. Out of those 5 files, 2 are exact duplicates. The remaining 3 files differ. From the differing files, 2 have commit hashes in `projects/thingamajig_base`. However, the file `projects/thingamajig_base/src/main/java/com/data/Data.java` has changes unique to `projects/thingamajig_special`.

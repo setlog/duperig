@@ -30,17 +30,19 @@ func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
+				labeText, labelColor := "Diff", color.FgYellow
 				commitA, commitB := commitForSha(dirA, relPath, comp.hashA), commitForSha(dirA, relPath, comp.hashB)
 				if commitA == "" || commitB == "" {
 					riggedCount++
+					labeText, labelColor = "Diff", color.FgRed
 				}
-				commitAStr, commitBStr := richCommit(commitA, color.FgHiBlack), richCommit(commitB, color.FgMagenta)
-				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize("DIFF", color.FgYellow, true), relPath,
+				commitAStr, commitBStr := richCommit(commitA, color.FgHiBlack), richCommit(commitB, color.FgYellow)
+				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize(labeText, labelColor, true), relPath,
 					colorize(comp.hashA[:10], color.FgHiBlack, true), commitAStr, colorize(comp.hashB[:10], color.FgHiBlack, true), commitBStr)
 				diffCount++
 			}
 		} else {
-			fmt.Printf("%s: %s @ %s\n", colorize("DUPE", color.FgHiWhite, true), relPath, colorize(comp.hashA[:10], color.FgHiBlack, true))
+			fmt.Printf("%s: %s @ %s\n", colorize("Dupe", color.FgHiWhite, true), relPath, colorize(comp.hashA[:10], color.FgHiBlack, true))
 			dupeCount++
 		}
 	}
