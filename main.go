@@ -26,16 +26,28 @@ type comparison struct {
 }
 
 func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
+	dupeCount, diffCount, riggedCount := 0, 0, 0
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
-				commitA, commitB := richCommit(commitForSha(dirA, relPath, comp.hashA), color.FgHiBlack), richCommit(commitForSha(dirA, relPath, comp.hashB), color.FgMagenta)
+				commitA, commitB := commitForSha(dirA, relPath, comp.hashA), commitForSha(dirA, relPath, comp.hashB)
+				if commitA == "" || commitB == "" {
+					riggedCount++
+				}
+				commitAStr, commitBStr := richCommit(commitA, color.FgHiBlack), richCommit(commitB, color.FgMagenta)
 				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize("DIFF", color.FgYellow, true), relPath,
-					colorize(comp.hashA[:10], color.FgHiBlack, true), commitA, colorize(comp.hashB[:10], color.FgHiBlack, true), commitB)
+					colorize(comp.hashA[:10], color.FgHiBlack, true), commitAStr, colorize(comp.hashB[:10], color.FgHiBlack, true), commitBStr)
+				diffCount++
 			}
 		} else {
 			fmt.Printf("%s: %s @ %s\n", colorize("DUPE", color.FgHiWhite, true), relPath, colorize(comp.hashA[:10], color.FgHiBlack, true))
+			dupeCount++
 		}
+	}
+	fmt.Printf("There are %d coinciding paths. Out of these, %d have matching files and %d have differing files.\n", dupeCount+diffCount, dupeCount, diffCount)
+	if riggedCount > 0 {
+		fmt.Printf("Out of the %d different files, "+colorize("%d files have modifications unknown to the repository at %s", color.FgRed, true)+".\n",
+			diffCount, riggedCount, gitRoot(dirA))
 	}
 }
 
