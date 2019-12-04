@@ -84,7 +84,10 @@ func parseFlags() (dirA, dirB string) {
 
 func scanDir(repoRoot, rootPath, relPath string) map[string]string {
 	m := make(map[string]string)
-	absPath := filepath.Join(rootPath, relPath)
+	absPath := filepath.Join(abs(rootPath), relPath)
+	if filepath.Join(repoRoot, ".git") == absPath {
+		return m
+	}
 	infos, err := ioutil.ReadDir(absPath)
 	if err != nil {
 		fatalf("Could not read dir \"%s\": %v", absPath, err)

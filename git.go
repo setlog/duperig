@@ -25,16 +25,16 @@ func commitForSha(repoRoot, rootPath, relPath, sha string) string {
 
 func gitRoot(atPath string) string {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-	abs, err := filepath.Abs(atPath)
+	workDir, err := filepath.Abs(atPath)
 	if err != nil {
 		panic(err)
 	}
-	cmd.Dir = abs
+	cmd.Dir = workDir
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		panic(err)
 	}
-	return strings.Trim(strings.TrimSpace(string(out)), "\n\t\r")
+	return abs(strings.Trim(strings.TrimSpace(string(out)), "\n\t\r"))
 }
 
 // map-key is SHA-256 of file content; map-value is commit SHA
@@ -70,22 +70,6 @@ func shasOfFile(repoRoot, rootPath, relPath string) map[string]string {
 		m[hex.EncodeToString(hash.Sum(nil))] = commit
 	}
 	return m
-}
-
-func rel(basePath, targPath string) string {
-	absBasePath, err := filepath.Abs(basePath)
-	if err != nil {
-		panic(err)
-	}
-	absTargPath, err := filepath.Abs(targPath)
-	if err != nil {
-		panic(err)
-	}
-	relPath, err := filepath.Rel(absBasePath, absTargPath)
-	if err != nil {
-		panic(err)
-	}
-	return relPath
 }
 
 func getCommitsForFile(repoRoot, repoRelPath string) []string {
