@@ -31,14 +31,14 @@ func logComparisons(repoRootA, dirA, dirB string, comparisons map[string]compari
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
-				labeText, labelColor := "Diff", color.FgYellow
+				labelText, labelColor := "Diff", color.FgYellow
 				commitA, commitB := commitForSha(repoRootA, dirA, relPath, comp.hashA), commitForSha(repoRootA, dirA, relPath, comp.hashB)
 				if commitA == "" || commitB == "" {
 					riggedCount++
-					labeText, labelColor = "Diff", color.FgRed
+					labelText, labelColor = "Diff", color.FgRed
 				}
 				commitAStr, commitBStr := richCommit(commitA, color.FgHiBlack), richCommit(commitB, color.FgYellow)
-				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize(labeText, labelColor, true), relPath,
+				fmt.Printf("%s: %s: %s %s vs %s %s\n", colorize(labelText, labelColor, true), relPath,
 					colorize(comp.hashA[:10], color.FgHiBlack, true), commitAStr, colorize(comp.hashB[:10], color.FgHiBlack, true), commitBStr)
 				diffCount++
 			}
