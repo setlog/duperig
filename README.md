@@ -4,7 +4,8 @@ Find copied and modified (*duped* and *rigged*) files between two related folder
 
 ### Requirements
 
-Some version of git which isn't ancient. Tested with git `2.17.1`.
+* Some version of git which isn't ancient. Tested with git `2.17.1`.
+* Go 1.13.
 
 ### Installation
 

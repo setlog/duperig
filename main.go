@@ -15,9 +15,10 @@ import (
 
 func main() {
 	dirA, dirB := parseFlags()
-	dirAHierarchy, dirBHierarchy := scanDir(dirA, "."), scanDir(dirB, ".")
+	gitRootA, gitRootB := gitRoot(dirA), gitRoot(dirB)
+	dirAHierarchy, dirBHierarchy := scanDir(gitRootA, dirA, "."), scanDir(gitRootB, dirB, ".")
 	comparisons := compareHierarchies(dirAHierarchy, dirBHierarchy)
-	logComparisons(dirA, dirB, comparisons)
+	logComparisons(gitRootA, dirA, dirB, comparisons)
 }
 
 type comparison struct {
@@ -25,13 +26,13 @@ type comparison struct {
 	hashB string
 }
 
-func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
+func logComparisons(repoRootA, dirA, dirB string, comparisons map[string]comparison) {
 	dupeCount, diffCount, riggedCount := 0, 0, 0
 	for relPath, comp := range comparisons {
 		if comp.hashA != comp.hashB {
 			if comp.hashA != "" && comp.hashB != "" {
 				labeText, labelColor := "Diff", color.FgYellow
-				commitA, commitB := commitForSha(dirA, relPath, comp.hashA), commitForSha(dirA, relPath, comp.hashB)
+				commitA, commitB := commitForSha(repoRootA, dirA, relPath, comp.hashA), commitForSha(repoRootA, dirA, relPath, comp.hashB)
 				if commitA == "" || commitB == "" {
 					riggedCount++
 					labeText, labelColor = "Diff", color.FgRed
@@ -49,7 +50,7 @@ func logComparisons(dirA, dirB string, comparisons map[string]comparison) {
 	fmt.Printf("There are %d coinciding paths. Out of these, %d have matching files and %d have differing files.\n", dupeCount+diffCount, dupeCount, diffCount)
 	if riggedCount > 0 {
 		fmt.Printf("Out of the %d different files, "+colorize("%d files have modifications unknown to the repository at %s", color.FgRed, true)+".\n",
-			diffCount, riggedCount, gitRoot(dirA))
+			diffCount, riggedCount, repoRootA)
 	}
 }
 
@@ -81,7 +82,7 @@ func parseFlags() (dirA, dirB string) {
 	return flag.Arg(0), flag.Arg(1)
 }
 
-func scanDir(rootPath string, relPath string) map[string]string {
+func scanDir(repoRoot, rootPath, relPath string) map[string]string {
 	m := make(map[string]string)
 	absPath := filepath.Join(rootPath, relPath)
 	infos, err := ioutil.ReadDir(absPath)
@@ -90,7 +91,7 @@ func scanDir(rootPath string, relPath string) map[string]string {
 	}
 	for _, info := range infos {
 		if info.IsDir() {
-			subDirMap := scanDir(rootPath, filepath.Join(relPath, info.Name()))
+			subDirMap := scanDir(repoRoot, rootPath, filepath.Join(relPath, info.Name()))
 			insertAll(subDirMap, m)
 		} else {
 			m[filepath.Join(relPath, info.Name())] = hash(filepath.Join(absPath, info.Name()))

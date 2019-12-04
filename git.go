@@ -11,9 +11,9 @@ import (
 )
 
 // returns most recent commit hash where SHA-256 of file rootPath/relPath matches sha
-func commitForSha(rootPath, relPath, sha string) string {
+func commitForSha(repoRoot, rootPath, relPath, sha string) string {
 	// fmt.Println("commitForSha", rootPath, relPath, sha)
-	shas := shasOfFile(rootPath, relPath)
+	shas := shasOfFile(repoRoot, rootPath, relPath)
 	// fmt.Println("SHAs of file", filepath.Join(rootPath, relPath), "=", shas)
 	for contentSha, commit := range shas {
 		if sha == contentSha {
@@ -38,8 +38,7 @@ func gitRoot(atPath string) string {
 }
 
 // map-key is SHA-256 of file content; map-value is commit SHA
-func shasOfFile(rootPath, relPath string) map[string]string {
-	repoRoot := gitRoot(rootPath)
+func shasOfFile(repoRoot, rootPath, relPath string) map[string]string {
 	fileCommits := getCommitsForFile(repoRoot, rel(repoRoot, filepath.Join(rootPath, relPath)))
 	// fmt.Println("Commits of file", filepath.Join(rootPath, relPath), "=", fileCommits)
 	m := make(map[string]string)
