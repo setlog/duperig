@@ -10,7 +10,7 @@ Find copied and modified (*duped* and *rigged*) files between two related folder
 ### Installation
 
 ```
-go get -u github.com/MMulthaupt/duperig
+go get -u github.com/setlog/duperig
 ```
 
 ### Usage
